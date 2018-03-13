@@ -5,11 +5,13 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import br.com.projetoejb.models.Produto;
 
 
 @Stateless
+//@Interceptors({LogInterceptador.class})
 public class ProdutoDao {
 	
 	@PersistenceContext
@@ -18,6 +20,7 @@ public class ProdutoDao {
 	public void persist(Produto produto) {
 
 		this.manager.persist(produto);
+
 
 	}
 
@@ -41,7 +44,7 @@ public class ProdutoDao {
 		return produtos;
 	}
 
-	public Produto finById(Integer id) {
+	public Produto findById(Integer id) {
 		
 		Produto produto = this.manager.find(Produto.class, id);
 
@@ -53,6 +56,13 @@ public class ProdutoDao {
 		long result = (Long) this.manager.createQuery("select count(p) from Produto p").getSingleResult();
 
 		return (int) result;
+	}
+
+	public List<Produto> findByDesc(String descricao) {
+		TypedQuery<Produto> query = this.manager.createQuery("select p from Produto p where p.descricao like :pDescricao", Produto.class);
+		query.setParameter("pDescricao", "%" + descricao + "%");
+		
+		return query.getResultList();
 	}
 	
 }

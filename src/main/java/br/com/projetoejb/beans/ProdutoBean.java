@@ -9,9 +9,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.transaction.Transactional;
 
-import br.com.projetoejb.daos.ProdutoDao;
+import br.com.projetoejb.daos.ProdutoService;
 import br.com.projetoejb.models.Produto;
 
 @Named
@@ -24,10 +23,13 @@ public class ProdutoBean implements Serializable{
 	private Produto produto = new Produto();
 
 	@Inject
-	private ProdutoDao produtoDao;
+	private ProdutoService produtoService;
 	
 	@Inject
 	FacesContext context;
+	
+	//@Inject 
+	//TesteSingleton testeSingleton;
 
 	public ProdutoBean() {
 
@@ -35,29 +37,35 @@ public class ProdutoBean implements Serializable{
 	}
 
 
-	@Transactional
+	//@SuppressWarnings("static-access")
+	//@Transactional o EJB por padrão ja faz o controle pelo container
 	public String salvar() {
 		System.out.println("REALIZANDO A FUNCAO DE SALVAR");
 
 		if (produto.getId() == null) {
-			this.produtoDao.persist(produto);
+			this.produtoService.persist(produto);
 
 			this.context.getExternalContext().getFlash().setKeepMessages(true);
 			this.context.addMessage(null, new FacesMessage("Produto cadastrado com sucesso!"));
 		}
+		
+		
+		//System.out.println(testeSingleton.TESTE);
+		
 		return "home?faces-redirect=true";
+		//return "";
 	}
 	
 	public List<Produto> listar() {
-		return this.produtoDao.findAll();
+		return this.produtoService.findAll();
 	}
 	
 	public int contarProdutos() {
-		return this.produtoDao.count();
+		return this.produtoService.count();
 	}
 
 	public Produto pesquisarProduto(Integer id) {
-		return this.produtoDao.finById(id);
+		return this.produtoService.findById(id);
 	}
 	
 	public List<Produto> getProdutos() {
